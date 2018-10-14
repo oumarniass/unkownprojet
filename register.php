@@ -1,6 +1,66 @@
 <?php require "inc/header.php";?>
 <?php require "inc/db.php";?>
 
+
+<?php
+    if(isset($_POST['submit']))
+    {
+        
+            if(empty($_POST['username']) || !preg_match('/^[a-zA-Z0-9_]+$/',$_POST['username']))
+            {
+                echo "Votre pseudo n'est pas valide"."<br>";
+            }
+            else
+            {
+                $req = $pdo->prepare("SELECT id from users where username = ?");
+                $req->execute([$_POST['username']]);
+                $user = $req->fetch();
+                if($user)
+                {
+                    die("Cette nom d'utilissateurs existe deja"."<br>");
+                }
+            }
+            if (empty($_POST['email']) || !filter_var($_POST['email'],FILTER_VALIDATE_EMAIL)){
+             
+                echo "Email non valide"."<br>";
+
+            }
+            else
+            {
+                $req = $pdo->prepare("SELECT id from users where email = ?");
+                $req->execute([$_POST['email']]);
+                $user = $req->fetch();
+                if($user)
+                {
+                     die("Cette email est deja pris veillez en choisir un autre "."<br>");
+                }
+            if(empty($_POST['password1']) || $_POST['password'] !=empty($_POST['password2']))
+            {
+                 die("Les mots de passe ne corresponds pas"."<br>");
+
+            }
+
+                $req = $pdo->prepare("INSERT INTO users SET username = ?, password = ?, email = ?");
+
+                $password_crypter = password_hash($_POST['password'],PASSWORD_BCRYPT);
+
+                $req->execute([$_POST['username'],$_POST['email'],$password_crypter]);
+
+                die("Votre compte a ete ajouter avec succes");
+
+
+
+            }
+    
+?>
+
+
+<?php
+
+
+     }
+
+?>
 <form action="register.php" method="POST" class="container">
     <div class="form-group">
     <label>pseudo</label>
@@ -21,60 +81,3 @@
         </div>
     
 </form>
-<?php
-    if(isset($_POST['submit']))
-    {
-        
-            if(empty($_POST['username']) || !preg_match('/^[a-zA-Z0-9_]+$/',$_POST['username']))
-            {
-                echo "Votre pseudo n'est pas valide"."<br>";
-            }
-            else
-            {
-                $req = $pdo->prepare("SELECT id from users where username = ?");
-                $req->execute([$_POST['username']]);
-                $user = $req->fetch();
-                if($user)
-                {
-                    echo "Cette nom d'utilissateurs existe deja"."<br>";
-                }
-            }
-            if (empty($_POST['email']) || !filter_var($_POST['email'],FILTER_VALIDATE_EMAIL)){
-             
-                echo "Email non valide"."<br>";
-
-            }
-            else
-            {
-                $req = $pdo->prepare("SELECT email from users where email = ?");
-                $req->execute([$_POST['username']]);
-                $user = $req->fetch();
-                if($user)
-                {
-                    echo "Cette email est deja pris veillez en choisir un autre  existe deja"."<br>";
-                }
-            if(empty($_POST['password1']) || $_POST['password'] =! empty($_POST['password2']))
-            {
-                echo "Les mots de passe ne corresponds pas"."<br>";
-            }
-         
-       
-    }
-    
-?>
-
-
-<?php
-
-if(isset($_POST['submit']))
-{
-  $req = $pdo->prepare("INSERT INTO users SET username = ?, password = ?, email = ?");
-
-    $password_crypter = password_hash($_POST['password'],PASSWORD_BCRYPT);
-    
-    $req->execute([$_POST['username'],$_POST['email'],$password_crypter]);
-
-    die("Votre compte a ete ajouter avec succes");
-    }
-    }
-?>
