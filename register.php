@@ -40,22 +40,22 @@
 
             }
 
-                $req = $pdo->prepare("INSERT INTO users SET username = ?, password = ?, email = ?");
+                $req = $pdo->prepare("INSERT INTO users SET username = ?, password = ?, email = ?, confirmation_token = ?");
 
-                $password_crypter = password_hash($_POST['password'],PASSWORD_BCRYPT);
+                $password_crypter = password_hash($_POST['password'],PASSWORD_BCRYPT)
+                    $token= str_random(60);
 
-                $req->execute([$_POST['username'],$_POST['email'],$password_crypter]);
+                $req->execute([$_POST['username'],$_POST['email'],$password_crypter,$token]);
 
-                die("Votre compte a ete ajouter avec succes");
+                mail($_POST['email'],"Confirmation de votre compte","duhiuedfhuihifhiuhqfihfiuf http://localhost/User/confirm.php");
+                //die("Votre compte a ete ajouter avec succes");
 
 
 
             }
     
-?>
 
 
-<?php
 
 
      }
@@ -81,3 +81,12 @@
         </div>
     
 </form>
+<?php
+    function str_random($length)
+    {
+        $alphabet = "0123456789abcdefghijklmnopkrstovwxyzABCDEFGHIJKLMNOPKRSTOWXYZ";
+        return substr(str_shuffle(str_repeat($alphabet,$length)),0,$length);
+    }
+
+    str_random(60);
+?>
